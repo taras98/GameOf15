@@ -11,9 +11,9 @@
             <MenuItem Header="Shuffler" Click="NewGame_Click"></MenuItem>
             <MenuItem Header="Solver" Click="MenuItem_Click" />
             <Label Content="Count of steps:"/>
-            <TextBox Name="StepsBox" Height="23" TextWrapping="Wrap" Text="" Width="68"/>
+            <TextBox Name="StepsBox" Text="50" Height="23" TextWrapping="Wrap" Width="68"/>
             <Label Content="Speed"/>
-            <TextBox x:Name="SpeedBox" Height="23" TextWrapping="Wrap" Text="" Width="68"/>
+            <TextBox x:Name="SpeedBox" Height="23" TextWrapping="Wrap" Text="100" Width="68"/>
         </Menu>
         <UniformGrid Name="gr" Rows="4" Columns="4" Margin="0,25,0,0">
             <Button  Name="button0" Content="-" Tag ="0" Click="Button_Click" />

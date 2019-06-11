@@ -24,8 +24,8 @@ namespace game
     public partial class MainWindow : Window
     {
         string path = @"1.txt";
-        string path2 = @"2.txt";
-        string path3 = @"3.txt";
+        string path2 = @"ShufflerLog.txt";
+        string path3 = @"SolverLog.txt";
         static object locker = new object();
         Game15 game;
         int speed, steps;
@@ -126,7 +126,7 @@ namespace game
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
             start_game();
-            
+
         }
 
         private void MenuItem_Click(object sender, RoutedEventArgs e)
@@ -135,10 +135,6 @@ namespace game
             Thread myThread = new Thread(new ThreadStart(Solver));
             myThread.Start();
 
-
-            //Thread.Sleep(300);
-
-
             if (game.check_numbers())
             {
                 MessageBox.Show("Win", "Win");
@@ -146,43 +142,48 @@ namespace game
                 return;
 
             }
-
-
-
         }
 
         public void Solver()
         {
-            //Dispatcher.Invoke(() =>
-            //{
-                string[] lines = File.ReadAllLines(path);
 
-                IEnumerable<string> revLines = lines.Reverse();
+            string[] lines = File.ReadAllLines(path);
 
+            IEnumerable<string> revLines = lines.Reverse();
 
+            using (StreamWriter sw = new StreamWriter(path3, false, System.Text.Encoding.Default))
+            {
                 foreach (string line in revLines)
                 {
                     string[] divided = line.Split(',');
                     if (Convert.ToInt32(divided[1]) == 1)
                     {
                         game.shift((Convert.ToInt32(divided[0]) - 1));
+                        if (divided[0] != "-1") sw.WriteLine((Convert.ToInt32(divided[0]) + 1) + ". <");
                     }
                     if (Convert.ToInt32(divided[1]) == 2)
                     {
                         game.shift((Convert.ToInt32(divided[0]) + 1));
+                        if (divided[0] != "-1") sw.WriteLine((Convert.ToInt32(divided[0]) + 1) + ". >");
+
                     }
                     if (Convert.ToInt32(divided[1]) == 3)
                     {
                         game.shift((Convert.ToInt32(divided[0]) - 4));
+                        if (divided[0] != "-1") sw.WriteLine((Convert.ToInt32(divided[0]) + 1) + ". v");
+
                     }
                     if (Convert.ToInt32(divided[1]) == 4)
                     {
                         game.shift((Convert.ToInt32(divided[0]) + 4));
+                        if (divided[0] != "-1") sw.WriteLine((Convert.ToInt32(divided[0]) + 1) + ". ^");
+
                     }
                     refresh();
                     Thread.Sleep(speed);
                 }
-            //});
+                sw.Close();
+            }
         }
 
 
