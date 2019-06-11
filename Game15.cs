@@ -83,10 +83,7 @@ namespace game
                     direction = 4;
                     break;  //низ
             }
-            //shift(coordsToPosition(x, y));
-
             return shift(coordsToPosition(x, y)).ToString() + separator + direction.ToString();
-            //return (coordsToPosition(x, y) + 1).ToString() + ". " + direction;
 
         }
         public void solver(int a)

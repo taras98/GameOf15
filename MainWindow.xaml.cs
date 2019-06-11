@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -25,12 +26,14 @@ namespace game
         string path = @"1.txt";
         string path2 = @"2.txt";
         string path3 = @"3.txt";
-
+        static object locker = new object();
         Game15 game;
+        int speed, steps;
         public MainWindow()
         {
             InitializeComponent();
             game = new Game15(4);
+
         }
 
         private void Button_Click(object sender, RoutedEventArgs e)
@@ -72,11 +75,13 @@ namespace game
 
         private void NewGame_Click(object sender, RoutedEventArgs e)
         {
+            steps = Convert.ToInt32(StepsBox.Text);
+            speed = Convert.ToInt32(SpeedBox.Text);
             start_game();
             using (StreamWriter sw = new StreamWriter(path, false, System.Text.Encoding.Default))
             {
 
-                for (int i = 0; i < 5; i++)
+                for (int i = 0; i < steps; i++)
                 {
 
                     sw.WriteLine(game.shuffler());
@@ -106,26 +111,55 @@ namespace game
         }
         private void refresh()
         {
-            for (int position = 0; position < 16; position++)
+
+            Dispatcher.Invoke(() =>
             {
-                button(position).Content = game.getNumber(position);
-                if (game.getNumber(position) > 0) button(position).Visibility = Visibility.Visible;
-                else button(position).Visibility = Visibility.Hidden;
-            }
+                for (int position = 0; position < 16; position++)
+                {
+                    button(position).Content = game.getNumber(position);
+                    if (game.getNumber(position) > 0) button(position).Visibility = Visibility.Visible;
+                    else button(position).Visibility = Visibility.Hidden;
+                }
+            });
         }
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
             start_game();
+            
         }
 
         private void MenuItem_Click(object sender, RoutedEventArgs e)
         {
-            string[] lines = File.ReadAllLines(path);
 
-            IEnumerable<string> revLines = lines.Reverse();
+            Thread myThread = new Thread(new ThreadStart(Solver));
+            myThread.Start();
 
-            
+
+            //Thread.Sleep(300);
+
+
+            if (game.check_numbers())
+            {
+                MessageBox.Show("Win", "Win");
+                start_game();
+                return;
+
+            }
+
+
+
+        }
+
+        public void Solver()
+        {
+            //Dispatcher.Invoke(() =>
+            //{
+                string[] lines = File.ReadAllLines(path);
+
+                IEnumerable<string> revLines = lines.Reverse();
+
+
                 foreach (string line in revLines)
                 {
                     string[] divided = line.Split(',');
@@ -145,21 +179,13 @@ namespace game
                     {
                         game.shift((Convert.ToInt32(divided[0]) + 4));
                     }
-
                     refresh();
-                    Thread.Sleep(5000);
+                    Thread.Sleep(speed);
                 }
-                if (game.check_numbers())
-                {
-                    MessageBox.Show("Win", "Win");
-                    start_game();
-                    return;
-
-                }
-
-            
-
+            //});
         }
+
+
     }
 }
 
